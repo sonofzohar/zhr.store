@@ -193,7 +193,7 @@
 
   .product-card{
     background:var(--bg-card); border:1px solid var(--border);
-    border-radius:var(--radius); padding:26px;
+    border-radius:var(--radius); padding:24px;
     position:relative; overflow:hidden;
     transition:all .3s; cursor:pointer;
   }
@@ -212,25 +212,62 @@
   .product-card.selected{ border-color:var(--red-bright); box-shadow:0 0 34px rgba(192,21,42,.28),var(--shadow-card); }
   .product-card.selected::after{ opacity:1; }
 
+  /* Product Image Styling */
+  .product-img-wrapper {
+    width: 100%;
+    height: 180px;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 18px;
+    position: relative;
+    border: 1px solid var(--border);
+  }
+  .product-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.65;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .product-card:hover .product-img {
+    opacity: 0.9;
+    transform: scale(1.08);
+  }
+  .product-card.selected .product-img {
+    opacity: 1;
+    filter: sepia(0.4) hue-rotate(-20deg) saturate(1.5);
+  }
+
   .card-icon{
-    width:50px; height:50px;
-    background:rgba(192,21,42,.1); border:1px solid var(--border);
-    border-radius:12px; display:flex; align-items:center; justify-content:center;
-    font-size:1.5rem; margin-bottom:16px;
+    position: absolute;
+    bottom: 12px;
+    left: 12px;
+    width: 44px; height: 44px;
+    background: rgba(7, 8, 10, 0.7); 
+    backdrop-filter: blur(8px);
+    border:1px solid rgba(192,21,42,.4);
+    border-radius:10px; display:flex; align-items:center; justify-content:center;
+    font-size:1.3rem;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    z-index: 2;
   }
 
   .card-tag{
-    position:absolute; top:16px; right:16px;
-    background:rgba(232,160,32,.12); border:1px solid var(--border-gold);
-    color:var(--gold); font-size:.67rem; font-weight:700; letter-spacing:1.5px;
-    padding:3px 9px; border-radius:4px; text-transform:uppercase;
+    position:absolute; top:12px; right:12px;
+    background:rgba(232,160,32,.9); border:1px solid var(--border-gold);
+    color:#000; font-size:.65rem; font-weight:800; letter-spacing:1.5px;
+    padding:4px 10px; border-radius:6px; text-transform:uppercase;
+    z-index: 2;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
   }
 
   .selected-check{
-    display:none; position:absolute; top:14px; right:14px;
-    width:24px; height:24px; border-radius:50%;
+    display:none; position:absolute; top:12px; right:12px;
+    width:28px; height:28px; border-radius:50%;
     background:var(--red-bright); align-items:center; justify-content:center;
-    font-size:.75rem; color:#fff; font-weight:900;
+    font-size:.8rem; color:#fff; font-weight:900;
+    z-index: 3;
+    box-shadow: 0 0 15px var(--red-bright);
   }
   .product-card.selected .selected-check{ display:flex; }
   .product-card.selected .card-tag{ display:none; }
@@ -899,12 +936,12 @@ const STORE_CONFIG = {
 // DAFTAR PRODUK (Tambah/Hapus/Edit produk Anda di sini)
 // Tag bisa berupa: POPULER, TRENDING, PREMIUM, NEW, LIFESTYLE, HOT, dll.
 const ALL_PRODUCTS = [
-  { id:'1', name:'ZHR Engine', icon:'🎙️', price:99000, oldPrice:149000, tag:'POPULER', desc:'Produksi konten Podcast, Storyboard, dan Commercial Studio berkualitas profesional dengan bantuan AI.' },
-  { id:'2', name:'Product Photo Engine', icon:'📸', price:99000, oldPrice:149000, tag:'TRENDING', desc:'Studio Foto Virtual Tanpa Batas — hasilkan foto produk berkualitas tinggi tanpa perlu studio fisik.' },
-  { id:'3', name:'Documentary & Drama Engine', icon:'🎬', price:99000, oldPrice:149000, tag:'PREMIUM', desc:'Produksi Film & Drama Sinematik dengan kualitas layar lebar — langsung dari prompt AI Anda.' },
-  { id:'4', name:'Fashion Design Engine', icon:'👗', price:99000, oldPrice:149000, tag:'NEW', desc:'Ubah sketsa busana menjadi tampilan realistik premium — sempurna untuk desainer dan brand fashion.' },
-  { id:'5', name:'Dapur Pintar AI', icon:'🍳', price:99000, oldPrice:149000, tag:'LIFESTYLE', desc:'Resep & Nutrisi Cerdas berbasis AI — menu sehat, rekomendasi bahan, dan rencana makan otomatis.' },
-  { id:'6', name:'Architec Render', icon:'🏛️', price:99000, oldPrice:149000, tag:'HOT', desc:'Ubah 2D Sketch menjadi 3D Realistic Render — visualisasi arsitektur profesional dalam hitungan detik.' }
+  { id:'1', name:'ZHR Engine', icon:'🎙️', img: 'https://images.unsplash.com/photo-1590602847861-f357a9332bbc?w=500&q=80', price:99000, oldPrice:149000, tag:'POPULER', desc:'Produksi konten Podcast, Storyboard, dan Commercial Studio berkualitas profesional dengan bantuan AI.' },
+  { id:'2', name:'Product Photo Engine', icon:'📸', img: 'https://images.unsplash.com/photo-1542038784456-1ea8e935640e?w=500&q=80', price:99000, oldPrice:149000, tag:'TRENDING', desc:'Studio Foto Virtual Tanpa Batas — hasilkan foto produk berkualitas tinggi tanpa perlu studio fisik.' },
+  { id:'3', name:'Documentary & Drama Engine', icon:'🎬', img: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=500&q=80', price:99000, oldPrice:149000, tag:'PREMIUM', desc:'Produksi Film & Drama Sinematik dengan kualitas layar lebar — langsung dari prompt AI Anda.' },
+  { id:'4', name:'Fashion Design Engine', icon:'👗', img: 'https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=500&q=80', price:99000, oldPrice:149000, tag:'NEW', desc:'Ubah sketsa busana menjadi tampilan realistik premium — sempurna untuk desainer dan brand fashion.' },
+  { id:'5', name:'Dapur Pintar AI', icon:'🍳', img: 'https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=500&q=80', price:99000, oldPrice:149000, tag:'LIFESTYLE', desc:'Resep & Nutrisi Cerdas berbasis AI — menu sehat, rekomendasi bahan, dan rencana makan otomatis.' },
+  { id:'6', name:'Architec Render', icon:'🏛️', img: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=500&q=80', price:99000, oldPrice:149000, tag:'HOT', desc:'Ubah 2D Sketch menjadi 3D Realistic Render — visualisasi arsitektur profesional dalam hitungan detik.' }
 ];
 /* ========================================== */
 
@@ -959,9 +996,12 @@ function renderProducts() {
   ALL_PRODUCTS.forEach(p => {
     grid.innerHTML += `
       <div class="product-card reveal" data-id="${p.id}" id="prodCard-${p.id}">
-        <div class="card-icon">${p.icon}</div>
-        <div class="card-tag">${p.tag}</div>
-        <div class="selected-check">✓</div>
+        <div class="product-img-wrapper">
+          <img src="${p.img}" alt="${p.name}" class="product-img" loading="lazy">
+          <div class="card-icon">${p.icon}</div>
+          <div class="card-tag">${p.tag}</div>
+          <div class="selected-check">✓</div>
+        </div>
         <div class="card-title">${p.name}</div>
         <div class="card-desc">${p.desc}</div>
         <div class="card-price-row">
