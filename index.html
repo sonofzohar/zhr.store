@@ -2,7 +2,7 @@
 <html lang="id" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ZHR Store - Digital Products</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -11,7 +11,6 @@
     <!-- Google Fonts: Plus Jakarta Sans -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
-    <!-- Konfigurasi Tailwind Khusus Tema Modern App -->
     <script>
         tailwind.config = {
             theme: {
@@ -21,21 +20,13 @@
                     },
                     colors: {
                         brand: {
-                            50: '#eff6ff',
-                            100: '#dbeafe',
-                            500: '#3b82f6',
-                            600: '#3564e9', // Diubah sedikit biru agar lebih mirip referensi tombol baru
-                            700: '#264ec4',
-                        },
-                        accent: {
-                            500: '#8b5cf6', // Purple accent
-                        },
-                        dark: '#111827',
-                        light: '#F8F9FA'
-                    },
-                    boxShadow: {
-                        'app': '0 10px 40px -10px rgba(0,0,0,0.08)',
-                        'app-sm': '0 4px 20px -5px rgba(0,0,0,0.05)',
+                            bg: '#080B14',      // Deep Dark Navy (Main Background)
+                            surface: '#111727', // Elevated Panel (Cards, Details)
+                            surface2: '#1A2235',// Hover states
+                            accent: '#F35B25',  // Vibrant Coral/Orange
+                            accentHover: '#D94D1D',
+                            textMuted: '#8A94A6', // Gray text
+                        }
                     }
                 }
             }
@@ -44,12 +35,13 @@
     
     <style>
         body {
-            background-color: #F8F9FA;
-            color: #111827;
+            background-color: #080B14;
+            color: #ffffff;
             -webkit-tap-highlight-color: transparent;
+            overflow-x: hidden;
         }
-        
-        /* Hide Scrollbar but keep functionality for horizontal scrolls */
+
+        /* Hide Scrollbar */
         .hide-scrollbar::-webkit-scrollbar {
             display: none;
         }
@@ -58,614 +50,609 @@
             scrollbar-width: none;
         }
 
-        /* App-like Card Hover Effects */
-        .app-card {
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-        .app-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 30px -10px rgba(0,0,0,0.1);
+        /* Hero Background Overlay Fade */
+        .hero-gradient {
+            background: linear-gradient(to bottom, rgba(8, 11, 20, 0.1) 0%, rgba(8, 11, 20, 0.8) 70%, rgba(8, 11, 20, 1) 100%);
         }
 
-        /* Modal Animation */
-        .modal-enter {
-            animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        /* Custom Button Styles (Matching Video Concept) */
+        .btn-outline {
+            border: 1px solid #F35B25;
+            color: #F35B25;
+            transition: all 0.3s ease;
         }
-        @keyframes slideUp {
-            from { transform: translateY(100%); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+        .btn-outline:hover {
+            background-color: #F35B25;
+            color: #ffffff;
+        }
+        .btn-solid {
+            background-color: #F35B25;
+            color: #ffffff;
+            transition: all 0.3s ease;
+        }
+        .btn-solid:hover {
+            background-color: #D94D1D;
         }
 
-        /* Bottom Sheet Animation for Bundle on Mobile */
-        .sheet-enter {
-            animation: sheetUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        /* Active Slider Card */
+        .card-active {
+            border: 1px solid rgba(243, 91, 37, 0.5);
+            background-color: #1A2235;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px -10px rgba(243, 91, 37, 0.15);
         }
-        @keyframes sheetUp {
-            from { transform: translateY(100%); }
-            to { transform: translateY(0); }
+
+        /* Animation for updating content */
+        .fade-in-up {
+            animation: fadeInUp 0.4s ease-out forwards;
         }
-        @media (min-width: 640px) {
-            .sheet-enter {
-                animation: popIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-            }
-            @keyframes popIn {
-                from { transform: scale(0.95); opacity: 0; }
-                to { transform: scale(1); opacity: 1; }
-            }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Image Masking for Gallery */
+        .gallery-img-mask {
+            mask-image: linear-gradient(to right, rgba(0,0,0,1) 80%, rgba(0,0,0,0) 100%);
+            -webkit-mask-image: linear-gradient(to right, rgba(0,0,0,1) 80%, rgba(0,0,0,0) 100%);
         }
     </style>
 </head>
-<body class="font-sans antialiased pb-24 md:pb-10 selection:bg-brand-100 selection:text-brand-700">
+
+<body class="font-sans antialiased pb-24 md:pb-10 selection:bg-brand-accent selection:text-white">
 
     <!-- Toast Notification -->
-    <div id="toast" class="fixed top-5 left-1/2 transform -translate-x-1/2 -translate-y-20 opacity-0 bg-gray-900 text-white px-6 py-3 rounded-full shadow-2xl transition-all duration-300 z-[200] flex items-center gap-3 font-medium text-sm">
-        <i id="toast-icon" class="fa-solid fa-circle-check text-green-400"></i>
+    <div id="toast" class="fixed top-5 left-1/2 transform -translate-x-1/2 -translate-y-20 opacity-0 bg-brand-surface border border-brand-accent/30 text-white px-6 py-3 rounded-md shadow-2xl transition-all duration-300 z-[200] flex items-center gap-3 font-medium text-sm">
+        <i id="toast-icon" class="fa-solid fa-circle-check text-brand-accent"></i>
         <span id="toast-message">Notifikasi</span>
     </div>
 
-    <!-- Top Navigation (App Style) -->
-    <nav class="sticky top-0 z-50 bg-[#F8F9FA]/90 backdrop-blur-md border-b border-gray-200/50" id="navbar">
-        <div class="max-w-5xl mx-auto px-4 sm:px-6">
-            <div class="flex justify-between items-center h-16">
-                <!-- User/Logo Profile -->
-                <div class="flex items-center gap-3 cursor-pointer" onclick="kembaliKeHome()">
-                    <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-brand-600 to-accent-500 p-[2px] shadow-sm">
-                        <div class="w-full h-full bg-white rounded-full flex items-center justify-center border-2 border-white">
-                            <i class="fa-solid fa-bolt text-brand-600 text-sm"></i>
-                        </div>
-                    </div>
-                    <div>
-                        <h1 class="font-bold text-gray-900 leading-tight">ZHR Store</h1>
-                        <p class="text-[10px] text-gray-500 font-medium">Digital Assets</p>
-                    </div>
-                </div>
-                
-                <!-- Action Icons -->
-                <div class="flex items-center gap-4">
-                    <button class="w-10 h-10 rounded-full bg-white shadow-app-sm flex items-center justify-center text-gray-600 hover:text-brand-600 transition-colors">
-                        <i class="fa-solid fa-magnifying-glass"></i>
-                    </button>
-                    <button class="w-10 h-10 rounded-full bg-white shadow-app-sm flex items-center justify-center text-gray-600 hover:text-brand-600 transition-colors relative">
-                        <i class="fa-regular fa-bell"></i>
-                        <span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
-                    </button>
-                </div>
+    <!-- Top Navigation -->
+    <nav class="absolute top-0 w-full z-50 bg-transparent" id="navbar">
+        <div class="max-w-7xl mx-auto px-6 sm:px-10 py-6 flex justify-between items-center">
+            <!-- Logo -->
+            <div class="flex items-center gap-3 cursor-pointer" onclick="kembaliKeHome()">
+                <h1 class="text-2xl font-extrabold text-white tracking-widest">ZHR Store</h1>
+            </div>
+            
+            <!-- Center Links (Desktop) -->
+            <div class="hidden md:flex items-center gap-10 text-sm font-medium text-brand-textMuted uppercase tracking-wider">
+                <a href="#" class="hover:text-white transition-colors">Location</a>
+                <a href="#explore" class="hover:text-white transition-colors">Products</a>
+                <a href="#" class="hover:text-white transition-colors">Schedule</a>
+                <a href="#" class="hover:text-white transition-colors">Availability</a>
+            </div>
+            
+            <!-- Right Action -->
+            <div class="flex items-center gap-4">
+                <button class="hidden md:block border border-brand-textMuted text-white px-6 py-2 rounded-sm text-sm uppercase tracking-wider hover:border-white transition-colors" onclick="bukaBundleModal()">
+                    Bundle
+                </button>
+                <button class="w-10 h-10 flex items-center justify-center text-white md:hidden">
+                    <i class="fa-solid fa-bars text-xl"></i>
+                </button>
             </div>
         </div>
     </nav>
 
-    <!-- Main Content App Wrapper -->
-    <div id="main-page" class="max-w-5xl mx-auto px-4 sm:px-6 pt-6 block">
+    <!-- Main Content Wrapper -->
+    <div id="main-page" class="block">
         
-        <!-- DISCOVER SECTION (Hero Bundle) -->
-        <div class="mb-8">
-            <h2 class="text-2xl font-extrabold text-gray-900 mb-4">Discover</h2>
-            
-            <div class="bg-white rounded-[2rem] p-2 shadow-app">
-                <div class="bg-gradient-to-br from-gray-900 to-gray-800 rounded-[1.5rem] p-6 sm:p-8 relative overflow-hidden app-card flex flex-col md:flex-row items-center gap-6">
-                    <!-- Abstract Background Elements -->
-                    <div class="absolute -top-20 -right-20 w-64 h-64 bg-accent-500/20 blur-3xl rounded-full"></div>
-                    <div class="absolute -bottom-20 -left-20 w-64 h-64 bg-brand-500/20 blur-3xl rounded-full"></div>
+        <!-- 1. HERO SECTION -->
+        <div class="relative w-full h-[85vh] min-h-[600px] flex flex-col justify-center px-6 sm:px-10 max-w-7xl mx-auto">
+            <!-- Hero Background Image (Absolute) -->
+            <div class="absolute inset-0 z-[-1]">
+                <img src="https://images.unsplash.com/photo-1485827404703-89b55fcc595e?q=80&w=1920&auto=format&fit=crop" class="w-full h-full object-cover opacity-60 mix-blend-luminosity" alt="Hero Background">
+                <div class="absolute inset-0 hero-gradient"></div>
+            </div>
+
+            <!-- Hero Content -->
+            <div class="relative z-10 w-full max-w-3xl mt-20">
+                <p class="text-brand-textMuted text-sm md:text-base font-medium mb-4 tracking-widest uppercase flex items-center gap-3">
+                    <span class="w-8 h-px bg-brand-accent"></span> Join us on a new era of digital setup
+                </p>
+                <h2 class="text-7xl md:text-[130px] font-black text-white leading-none tracking-tight mb-6">
+                    ZHR<span class="text-brand-accent">*</span>
+                </h2>
+                <p class="text-brand-textMuted text-base md:text-lg max-w-md leading-relaxed mb-6">
+                    Pegang otoritas market dan bangun sistem digital Anda. Dapatkan akses 4 paket bebas pilih dari koleksi eksklusif kami.
+                </p>
+                
+                <div class="mb-8 flex items-end gap-3">
+                    <span class="text-brand-accent font-black text-4xl">Rp 145.000</span>
+                    <span class="text-brand-textMuted line-through text-lg mb-1">Rp 399.000</span>
+                </div>
+                
+                <div class="flex flex-col sm:flex-row items-center gap-4">
+                    <button onclick="bukaBundleModal()" class="btn-solid px-8 py-4 rounded-sm font-bold uppercase tracking-widest text-sm flex items-center justify-center gap-3 w-full sm:w-max">
+                        Get Ultimate Bundle <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                    <button onclick="tanyaAdmin()" class="btn-outline px-8 py-4 rounded-sm font-bold uppercase tracking-widest text-sm flex items-center justify-center gap-3 w-full sm:w-max">
+                        <i class="fa-brands fa-whatsapp text-lg"></i> Tanya Dulu
+                    </button>
+                </div>
+            </div>
+
+            <!-- Scroll Indicator / Section Title Bottom -->
+            <div class="absolute bottom-10 left-6 sm:left-10 right-6 sm:right-10 flex flex-col md:flex-row md:items-end justify-between border-b border-white/10 pb-4 gap-4" id="explore">
+                <h3 class="text-3xl md:text-4xl font-bold text-white tracking-tight">Explore <br> Products</h3>
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-px bg-white/20 hidden md:block"></div>
+                    <span class="text-brand-textMuted text-sm uppercase tracking-widest"><i class="fa-solid fa-layer-group text-brand-accent mr-2"></i> Range of Systems</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. SLIDER SECTION ("Choose your Adventure") -->
+        <div class="max-w-7xl mx-auto px-6 sm:px-10 py-10 mb-10">
+            <p class="text-brand-textMuted text-sm max-w-2xl leading-relaxed mb-10">
+                Sistem komprehensif kami dirancang untuk mengotomatisasi dan mempercepat alur kerja produksi konten, desain, dan manajemen digital Anda. Geser untuk menjelajahi koleksi.
+            </p>
+
+            <div class="relative flex items-center">
+                <!-- Left Arrow -->
+                <button onclick="scrollSlider('left')" class="absolute -left-4 md:-left-12 z-20 w-10 h-10 flex items-center justify-center text-white hover:text-brand-accent transition-colors">
+                    <i class="fa-solid fa-chevron-left text-2xl"></i>
+                </button>
+
+                <!-- Slider Container -->
+                <div id="product-slider" class="flex gap-6 overflow-x-auto hide-scrollbar snap-x snap-mandatory py-4 px-2 w-full scroll-smooth">
+                    <!-- Cards Injected by JS -->
+                </div>
+
+                <!-- Right Arrow -->
+                <button onclick="scrollSlider('right')" class="absolute -right-4 md:-right-12 z-20 w-10 h-10 flex items-center justify-center text-white hover:text-brand-accent transition-colors">
+                    <i class="fa-solid fa-chevron-right text-2xl"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- 3. DETAIL SECTION ("Browse our Gallery") -->
+        <div class="max-w-7xl mx-auto px-6 sm:px-10 pb-20" id="detail-section">
+            <!-- Section Header -->
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-end border-b border-white/10 pb-4 mb-8">
+                <div class="max-w-xl">
+                    <h3 class="text-3xl md:text-4xl font-bold text-white tracking-tight mb-4">Product <br> Spotlight</h3>
+                    <p class="text-brand-textMuted text-sm leading-relaxed">
+                        Lihat detail spesifik dari produk yang Anda pilih. Setiap sistem dilengkapi panduan dan template siap pakai.
+                    </p>
+                </div>
+                <div class="mt-4 md:mt-0 flex items-center gap-4">
+                    <div class="w-12 h-px bg-white/20 hidden md:block"></div>
+                    <button class="text-white text-sm uppercase tracking-widest hover:text-brand-accent transition-colors flex items-center gap-2">
+                        <i class="fa-regular fa-square-plus"></i> View All Setup
+                    </button>
+                </div>
+            </div>
+
+            <!-- Detail Display Box (Darker Container) -->
+            <div class="bg-brand-surface rounded-sm overflow-hidden flex flex-col md:flex-row w-full min-h-[450px]" id="hero-display">
+                
+                <!-- Left: Image Area -->
+                <div class="w-full md:w-3/5 relative min-h-[250px] md:min-h-full">
+                    <img id="hero-img" src="https://images.unsplash.com/photo-1589903308904-1010c2294adc?auto=format&fit=crop&w=1000&q=80" alt="Product View" class="absolute inset-0 w-full h-full object-cover md:gallery-img-mask transition-all duration-500">
+                    <!-- Aesthetic Overlay elements -->
+                    <div class="absolute inset-0 bg-gradient-to-t from-brand-surface via-transparent to-transparent md:hidden"></div>
                     
-                    <div class="relative z-10 flex-grow w-full">
-                        <div class="flex gap-2 mb-4">
-                            <span class="bg-red-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-md uppercase tracking-wider flex items-center gap-1">
-                                <span class="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></span> Terbatas 50
-                            </span>
-                            <span class="bg-white/10 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-1 rounded-md uppercase tracking-wider border border-white/10">
-                                Full System
-                            </span>
-                        </div>
-                        <h3 class="text-3xl md:text-4xl font-extrabold text-white mb-2 leading-tight">ZHR Ultimate System</h3>
-                        <p class="text-gray-300 text-sm mb-6 max-w-md leading-relaxed">
-                            Pegang otoritas market dan bangun sistem digital Anda. Dapatkan akses bebas pilih <strong class="text-white">4 produk apapun</strong> dari koleksi kami!
-                        </p>
-                        
-                        <div class="flex items-end gap-3 mb-6">
-                            <span class="text-brand-100 font-extrabold text-3xl">Rp 149.000</span>
-                            <span class="text-gray-400 line-through text-sm mb-1">Rp 350.000</span>
-                        </div>
-
-                        <div class="flex flex-wrap gap-3">
-                            <!-- TOMBOL BUNDLE MEMBUKA PILIHAN PRODUK -->
-                            <button onclick="bukaBundleModal()" class="bg-brand-600 text-white font-bold py-3.5 px-6 rounded-xl text-sm hover:bg-brand-700 transition-colors shadow-lg shadow-brand-500/30 flex-grow md:flex-grow-0 text-center uppercase tracking-wide">
-                                AMBIL BUNDLING ( FULL PAKET )
-                            </button>
-                            <a href="#browse" class="bg-white/10 backdrop-blur-md text-white border border-white/20 font-bold py-3.5 px-6 rounded-xl text-sm hover:bg-white/20 transition-colors flex items-center justify-center gap-2">
-                                LIHAT PRODUCT <i class="fa-solid fa-arrow-down"></i>
-                            </a>
-                        </div>
-                    </div>
-
-                    <!-- App-like 3D Graphic Placeholder -->
-                    <div class="w-full md:w-1/3 aspect-square max-w-[200px] relative z-10 shrink-0 hidden sm:flex items-center justify-center">
-                        <div class="absolute inset-0 bg-gradient-to-tr from-brand-500 to-accent-500 rounded-3xl transform rotate-6 opacity-50 blur-lg"></div>
-                        <div class="bg-white/10 backdrop-blur-xl border border-white/20 w-full h-full rounded-3xl flex items-center justify-center relative shadow-2xl">
-                            <i class="fa-solid fa-crown text-6xl text-white drop-shadow-md"></i>
-                            <div class="absolute -bottom-3 -right-3 bg-white text-gray-900 text-xs font-bold px-3 py-1.5 rounded-lg shadow-lg">
-                                All in One
-                            </div>
-                        </div>
+                    <!-- Slide Indicator Box (Aesthetic from video) -->
+                    <div class="absolute bottom-6 left-6 flex gap-2">
+                        <div class="w-2 h-2 rounded-full bg-brand-accent"></div>
+                        <div class="w-2 h-2 rounded-full bg-white/30"></div>
+                        <div class="w-2 h-2 rounded-full bg-white/30"></div>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <!-- CATEGORY PILLS -->
-        <div class="mb-6 flex gap-3 overflow-x-auto hide-scrollbar py-2" id="browse">
-            <button class="bg-brand-600 text-white px-5 py-2 rounded-xl text-sm font-bold whitespace-nowrap shadow-md shadow-brand-500/20">Semua Kategori</button>
-            <button class="bg-white text-gray-600 border border-gray-200 px-5 py-2 rounded-xl text-sm font-semibold whitespace-nowrap hover:bg-gray-50 transition-colors">AI & Engine</button>
-            <button class="bg-white text-gray-600 border border-gray-200 px-5 py-2 rounded-xl text-sm font-semibold whitespace-nowrap hover:bg-gray-50 transition-colors">Kreatif & Desain</button>
-            <button class="bg-white text-gray-600 border border-gray-200 px-5 py-2 rounded-xl text-sm font-semibold whitespace-nowrap hover:bg-gray-50 transition-colors">Produktivitas</button>
-        </div>
-
-        <!-- BROWSE SECTION (Products Grid) -->
-        <h2 class="text-2xl font-extrabold text-gray-900 mb-4">Browse Products</h2>
-        
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 mb-10">
-            
-            <!-- Product 1: ZHR Engine -->
-            <div class="bg-white rounded-3xl p-3 shadow-app-sm border border-gray-100 app-card flex flex-col h-full relative">
-                <div class="absolute top-5 right-5 z-20 bg-brand-500 text-white text-[9px] font-bold px-2 py-1 rounded-md uppercase tracking-wider shadow-sm">
-                    Hot
-                </div>
-                <!-- Thumbnail -->
-                <div class="w-full aspect-square rounded-2xl mb-4 relative overflow-hidden group bg-gray-100">
-                    <div class="absolute inset-0 opacity-0 group-hover:opacity-100 bg-black/20 transition-opacity z-10 flex items-center justify-center">
-                        <i class="fa-solid fa-cart-plus text-white text-2xl transform scale-50 group-hover:scale-100 transition-transform duration-300"></i>
-                    </div>
-                    <img src="https://unsplash.com/photos/Qi1jCIhnmFY/download?w=600" alt="Podcast ZHR Engine" class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500">
-                </div>
-                <!-- Content -->
-                <div class="flex-grow flex flex-col px-1">
-                    <h3 class="font-bold text-gray-900 text-sm md:text-base leading-snug mb-1">ZHR Engine</h3>
-                    <p class="text-xs text-gray-500 line-clamp-2 mb-3">Produksi Konten Podcast, Storyboard & Produk</p>
+                <!-- Right: Content Area -->
+                <div class="w-full md:w-2/5 p-8 md:p-12 flex flex-col justify-center relative fade-in-up" id="hero-content">
                     
-                    <div class="mt-auto pt-3 border-t border-gray-100 flex items-center justify-between">
-                        <div>
-                            <span class="text-[10px] text-gray-400 line-through block leading-none">Rp 145.000</span>
-                            <span class="font-extrabold text-gray-900 text-sm">Rp 99.000</span>
-                        </div>
-                        <button onclick="bukaModal('ZHR Engine', 99000)" class="w-8 h-8 rounded-full bg-gray-900 text-white flex items-center justify-center hover:bg-brand-600 transition-colors shadow-sm shrink-0">
-                            <i class="fa-solid fa-plus text-xs"></i>
-                        </button>
+                    <div class="flex justify-between items-start mb-6">
+                        <h4 class="text-3xl md:text-4xl font-bold text-white leading-tight" id="hero-title">ZHR Engine</h4>
+                        <span class="text-brand-textMuted font-medium text-lg tracking-wider ml-4" id="hero-price-tag">Rp99k</span>
                     </div>
-                </div>
-            </div>
 
-            <!-- Product 2: Doc & Drama -->
-            <div class="bg-white rounded-3xl p-3 shadow-app-sm border border-gray-100 app-card flex flex-col h-full">
-                <!-- Thumbnail -->
-                <div class="w-full aspect-square rounded-2xl mb-4 relative overflow-hidden group bg-gray-100">
-                    <div class="absolute inset-0 opacity-0 group-hover:opacity-100 bg-black/20 transition-opacity z-10 flex items-center justify-center">
-                        <i class="fa-solid fa-cart-plus text-white text-2xl transform scale-50 group-hover:scale-100 transition-transform duration-300"></i>
-                    </div>
-                    <img src="https://unsplash.com/photos/8umEwssg2eU/download?w=600" alt="Doc & Drama - Film Production" class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500">
-                </div>
-                <div class="flex-grow flex flex-col px-1">
-                    <h3 class="font-bold text-gray-900 text-sm md:text-base leading-snug mb-1">Doc & Drama Engine</h3>
-                    <p class="text-xs text-gray-500 line-clamp-2 mb-3">Sistem Produksi Film & Drama Profesional</p>
-                    <div class="mt-auto pt-3 border-t border-gray-100 flex items-center justify-between">
-                        <div>
-                            <span class="text-[10px] text-gray-400 line-through block leading-none">Rp 145.000</span>
-                            <span class="font-extrabold text-gray-900 text-sm">Rp 99.000</span>
-                        </div>
-                        <button onclick="bukaModal('Doc & Drama Engine', 99000)" class="w-8 h-8 rounded-full bg-gray-900 text-white flex items-center justify-center hover:bg-brand-600 transition-colors shadow-sm shrink-0">
-                            <i class="fa-solid fa-plus text-xs"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
+                    <p class="text-brand-accent text-xs font-bold uppercase tracking-widest mb-4 border-l-2 border-brand-accent pl-3" id="hero-short-desc">
+                        Podcast & Storyboard
+                    </p>
 
-            <!-- Product 3: Audio Engine -->
-            <div class="bg-white rounded-3xl p-3 shadow-app-sm border border-gray-100 app-card flex flex-col h-full">
-                <!-- Thumbnail -->
-                <div class="w-full aspect-square rounded-2xl mb-4 relative overflow-hidden group bg-gray-100">
-                    <div class="absolute inset-0 opacity-0 group-hover:opacity-100 bg-black/20 transition-opacity z-10 flex items-center justify-center">
-                        <i class="fa-solid fa-cart-plus text-white text-2xl transform scale-50 group-hover:scale-100 transition-transform duration-300"></i>
-                    </div>
-                    <img src="https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&w=600&q=80" alt="Audio Engine - Mixing Lagu" class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500">
-                </div>
-                <div class="flex-grow flex flex-col px-1">
-                    <h3 class="font-bold text-gray-900 text-sm md:text-base leading-snug mb-1">Audio Engine</h3>
-                    <p class="text-xs text-gray-500 line-clamp-2 mb-3">Produksi Musik, Lagu & Sound Effect</p>
-                    <div class="mt-auto pt-3 border-t border-gray-100 flex items-center justify-between">
-                        <div>
-                            <span class="text-[10px] text-gray-400 line-through block leading-none">Rp 145.000</span>
-                            <span class="font-extrabold text-gray-900 text-sm">Rp 99.000</span>
-                        </div>
-                        <button onclick="bukaModal('Audio Engine', 99000)" class="w-8 h-8 rounded-full bg-gray-900 text-white flex items-center justify-center hover:bg-brand-600 transition-colors shadow-sm shrink-0">
-                            <i class="fa-solid fa-plus text-xs"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
+                    <p class="text-brand-textMuted text-sm leading-relaxed mb-8" id="hero-long-desc">
+                        Sistem komprehensif yang dirancang untuk mengotomatisasi dan mempercepat alur kerja produksi konten Anda. Ideal untuk kreator podcast, perancang storyboard, dan manajemen produk digital.
+                    </p>
 
-            <!-- Product 4: Dapur Pintar -->
-            <div class="bg-white rounded-3xl p-3 shadow-app-sm border border-gray-100 app-card flex flex-col h-full">
-                <!-- Thumbnail -->
-                <div class="w-full aspect-square rounded-2xl mb-4 relative overflow-hidden group bg-gray-100">
-                    <div class="absolute inset-0 opacity-0 group-hover:opacity-100 bg-black/20 transition-opacity z-10 flex items-center justify-center">
-                        <i class="fa-solid fa-cart-plus text-white text-2xl transform scale-50 group-hover:scale-100 transition-transform duration-300"></i>
-                    </div>
-                    <img src="https://images.unsplash.com/photo-1577219491135-ce391730fb2c?auto=format&fit=crop&w=600&q=80" alt="Dapur Pintar - Koki Wanita" class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500">
-                </div>
-                <div class="flex-grow flex flex-col px-1">
-                    <h3 class="font-bold text-gray-900 text-sm md:text-base leading-snug mb-1">Dapur Pintar</h3>
-                    <p class="text-xs text-gray-500 line-clamp-2 mb-3">Sistem Pencari & Manajemen Resep Masakan</p>
-                    <div class="mt-auto pt-3 border-t border-gray-100 flex items-center justify-between">
-                        <div>
-                            <span class="text-[10px] text-gray-400 line-through block leading-none">Rp 145.000</span>
-                            <span class="font-extrabold text-gray-900 text-sm">Rp 99.000</span>
+                    <!-- Specifications / Features -->
+                    <div class="mb-8">
+                        <h5 class="text-white text-xs font-bold uppercase tracking-widest mb-4">Features Overview</h5>
+                        <div class="grid gap-3 border-t border-white/10 pt-4" id="hero-features">
+                            <!-- Injected by JS -->
                         </div>
-                        <button onclick="bukaModal('Dapur Pintar', 99000)" class="w-8 h-8 rounded-full bg-gray-900 text-white flex items-center justify-center hover:bg-brand-600 transition-colors shadow-sm shrink-0">
-                            <i class="fa-solid fa-plus text-xs"></i>
-                        </button>
                     </div>
-                </div>
-            </div>
 
-            <!-- Product 5: Architec Render -->
-            <div class="bg-white rounded-3xl p-3 shadow-app-sm border border-gray-100 app-card flex flex-col h-full">
-                <!-- Thumbnail -->
-                <div class="w-full aspect-square rounded-2xl mb-4 relative overflow-hidden group bg-gray-100">
-                    <div class="absolute inset-0 opacity-0 group-hover:opacity-100 bg-black/20 transition-opacity z-10 flex items-center justify-center">
-                        <i class="fa-solid fa-cart-plus text-white text-2xl transform scale-50 group-hover:scale-100 transition-transform duration-300"></i>
-                    </div>
-                    <img src="https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=600&q=80" alt="Architec Render - Sketsa Arsitektur" class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500">
-                </div>
-                <div class="flex-grow flex flex-col px-1">
-                    <h3 class="font-bold text-gray-900 text-sm md:text-base leading-snug mb-1">Architec Render</h3>
-                    <p class="text-xs text-gray-500 line-clamp-2 mb-3">Render Gambar Denah 2D menjadi 3D Realistis</p>
-                    <div class="mt-auto pt-3 border-t border-gray-100 flex items-center justify-between">
-                        <div>
-                            <span class="text-[10px] text-gray-400 line-through block leading-none">Rp 145.000</span>
-                            <span class="font-extrabold text-gray-900 text-sm">Rp 99.000</span>
-                        </div>
-                        <button onclick="bukaModal('Architec Render', 99000)" class="w-8 h-8 rounded-full bg-gray-900 text-white flex items-center justify-center hover:bg-brand-600 transition-colors shadow-sm shrink-0">
-                            <i class="fa-solid fa-plus text-xs"></i>
+                    <div class="mt-auto pt-4 flex items-center justify-between">
+                        <button id="btn-hero-add" onclick="bukaModalHero()" class="btn-solid px-8 py-3.5 rounded-sm font-bold uppercase tracking-wider text-sm flex items-center gap-3 w-full justify-center shadow-lg shadow-brand-accent/20">
+                            BELI SEKARANG
                         </button>
                     </div>
                 </div>
             </div>
-
-            <!-- Product 6: Fashion Engine -->
-            <div class="bg-white rounded-3xl p-3 shadow-app-sm border border-gray-100 app-card flex flex-col h-full">
-                <!-- Thumbnail -->
-                <div class="w-full aspect-square rounded-2xl mb-4 relative overflow-hidden group bg-gray-100">
-                    <div class="absolute inset-0 opacity-0 group-hover:opacity-100 bg-black/20 transition-opacity z-10 flex items-center justify-center">
-                        <i class="fa-solid fa-cart-plus text-white text-2xl transform scale-50 group-hover:scale-100 transition-transform duration-300"></i>
-                    </div>
-                    <img src="https://unsplash.com/photos/KqgEIgqarFc/download?w=600" alt="Fashion Engine - Sketsa Busana" class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500">
-                </div>
-                <div class="flex-grow flex flex-col px-1">
-                    <h3 class="font-bold text-gray-900 text-sm md:text-base leading-snug mb-1">Fashion Engine</h3>
-                    <p class="text-xs text-gray-500 line-clamp-2 mb-3">Mengubah Sketsa Pakaian Menjadi Desain Real</p>
-                    <div class="mt-auto pt-3 border-t border-gray-100 flex items-center justify-between">
-                        <div>
-                            <span class="text-[10px] text-gray-400 line-through block leading-none">Rp 145.000</span>
-                            <span class="font-extrabold text-gray-900 text-sm">Rp 99.000</span>
-                        </div>
-                        <button onclick="bukaModal('Fashion Engine', 99000)" class="w-8 h-8 rounded-full bg-gray-900 text-white flex items-center justify-center hover:bg-brand-600 transition-colors shadow-sm shrink-0">
-                            <i class="fa-solid fa-plus text-xs"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Product 7: Photo Product -->
-            <div class="bg-white rounded-3xl p-3 shadow-app-sm border border-gray-100 app-card flex flex-col h-full">
-                <!-- Thumbnail -->
-                <div class="w-full aspect-square rounded-2xl mb-4 relative overflow-hidden group bg-gray-100">
-                    <div class="absolute inset-0 opacity-0 group-hover:opacity-100 bg-black/20 transition-opacity z-10 flex items-center justify-center">
-                        <i class="fa-solid fa-cart-plus text-white text-2xl transform scale-50 group-hover:scale-100 transition-transform duration-300"></i>
-                    </div>
-                    <img src="https://unsplash.com/photos/PdbUq75g5gk/download?w=600" alt="Photo Product - Studio" class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500">
-                </div>
-                <div class="flex-grow flex flex-col px-1">
-                    <h3 class="font-bold text-gray-900 text-sm md:text-base leading-snug mb-1">Photo Product</h3>
-                    <p class="text-xs text-gray-500 line-clamp-2 mb-3">Studio Foto Produk Virtual Kualitas Tinggi</p>
-                    <div class="mt-auto pt-3 border-t border-gray-100 flex items-center justify-between">
-                        <div>
-                            <span class="text-[10px] text-gray-400 line-through block leading-none">Rp 145.000</span>
-                            <span class="font-extrabold text-gray-900 text-sm">Rp 99.000</span>
-                        </div>
-                        <button onclick="bukaModal('Photo Product', 99000)" class="w-8 h-8 rounded-full bg-gray-900 text-white flex items-center justify-center hover:bg-brand-600 transition-colors shadow-sm shrink-0">
-                            <i class="fa-solid fa-plus text-xs"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Product 8: AI Influencer -->
-            <div class="bg-white rounded-3xl p-3 shadow-app-sm border border-gray-100 app-card flex flex-col h-full">
-                <!-- Thumbnail -->
-                <div class="w-full aspect-square rounded-2xl mb-4 relative overflow-hidden group bg-gray-100">
-                    <div class="absolute inset-0 opacity-0 group-hover:opacity-100 bg-black/20 transition-opacity z-10 flex items-center justify-center">
-                        <i class="fa-solid fa-cart-plus text-white text-2xl transform scale-50 group-hover:scale-100 transition-transform duration-300"></i>
-                    </div>
-                    <img src="https://unsplash.com/photos/enQcrUMOp_U/download?w=600" alt="AI Influencer - Sosial Media" class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500">
-                </div>
-                <div class="flex-grow flex flex-col px-1">
-                    <h3 class="font-bold text-gray-900 text-sm md:text-base leading-snug mb-1">AI Influencer</h3>
-                    <p class="text-xs text-gray-500 line-clamp-2 mb-3">Menciptakan Karakter Influencer Virtual Anda</p>
-                    <div class="mt-auto pt-3 border-t border-gray-100 flex items-center justify-between">
-                        <div>
-                            <span class="text-[10px] text-gray-400 line-through block leading-none">Rp 145.000</span>
-                            <span class="font-extrabold text-gray-900 text-sm">Rp 99.000</span>
-                        </div>
-                        <button onclick="bukaModal('AI Influencer', 99000)" class="w-8 h-8 rounded-full bg-gray-900 text-white flex items-center justify-center hover:bg-brand-600 transition-colors shadow-sm shrink-0">
-                            <i class="fa-solid fa-plus text-xs"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
         </div>
+
     </div>
 
 
     <!-- ========================================== -->
     <!-- HALAMAN CHECKOUT / PEMBAYARAN -->
     <!-- ========================================== -->
-    <div id="checkout-page" class="hidden max-w-2xl mx-auto px-4 sm:px-6 pt-6 pb-20">
+    <div id="checkout-page" class="hidden max-w-3xl mx-auto px-6 pt-12 pb-20 relative z-20">
         <!-- Back Button -->
-        <button onclick="kembaliKeHome()" class="w-10 h-10 rounded-full bg-white shadow-app-sm flex items-center justify-center text-gray-600 hover:text-brand-600 transition-colors mb-6">
-            <i class="fa-solid fa-chevron-left"></i>
+        <button onclick="kembaliKeHome()" class="text-brand-textMuted hover:text-white transition-colors mb-8 flex items-center gap-2 uppercase text-xs font-bold tracking-widest">
+            <i class="fa-solid fa-arrow-left"></i> Back to Store
         </button>
 
-        <div class="bg-white rounded-[2rem] p-6 shadow-app">
-            <h2 class="text-2xl font-extrabold text-gray-900 mb-2">Checkout</h2>
-            <p class="text-gray-500 text-sm mb-6 pb-6 border-b border-gray-100">Order ID: <span id="checkout-order-id" class="font-bold text-brand-600">#ZHR-12345</span></p>
+        <div class="bg-brand-surface p-8 md:p-12 rounded-sm border border-white/5">
+            <h2 class="text-4xl font-bold text-white mb-2">Checkout</h2>
+            <p class="text-brand-textMuted text-sm mb-10 pb-6 border-b border-white/10">Order Reference: <span id="checkout-order-id" class="text-white font-mono">#ZHR-12345</span></p>
 
-            <!-- Order Summary -->
-            <div class="mb-8">
-                <h3 class="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4">Ringkasan Pesanan</h3>
-                <div class="bg-gray-50 rounded-2xl p-4 md:p-5 border border-gray-100">
-                    <div class="flex justify-between items-center mb-2">
-                        <p class="text-gray-900 font-bold" id="checkout-product-name">Nama Produk</p>
-                        <p class="text-gray-900 font-bold" id="checkout-product-price">Rp 0</p>
+            <div class="mb-10">
+                <h3 class="text-xs font-bold text-brand-textMuted uppercase tracking-widest mb-6">Order Summary</h3>
+                <div class="bg-brand-bg rounded-sm p-6 border border-white/5">
+                    <div class="flex justify-between items-center mb-3">
+                        <p class="text-white font-bold text-xl" id="checkout-product-name">Nama Produk</p>
+                        <p class="text-white font-bold text-xl" id="checkout-product-price">Rp 0</p>
                     </div>
-                    <p class="text-xs text-gray-500 mb-2">Akses Digital Instan</p>
+                    <p class="text-xs text-brand-accent mb-6 font-medium tracking-wide uppercase">Digital Access</p>
                     
-                    <!-- Tempat menampilkan daftar 4 produk yang dipilih (jika bundling) -->
-                    <ul id="checkout-bundle-items" class="hidden mb-4 pb-4 border-b border-gray-200 text-sm text-gray-700 list-inside list-disc space-y-1">
-                        <!-- Items injected by JS -->
+                    <ul id="checkout-bundle-items" class="hidden mb-6 pb-6 border-b border-white/10 text-sm text-brand-textMuted list-inside list-disc space-y-2">
                     </ul>
-                    <div id="checkout-divider" class="border-b border-gray-200 mb-4 pb-4"></div>
+                    <div id="checkout-divider" class="border-b border-white/10 mb-6 pb-2"></div>
                     
                     <div class="flex justify-between items-center">
-                        <p class="text-gray-900 font-extrabold">Total Bayar</p>
-                        <p class="text-brand-600 font-extrabold text-xl" id="checkout-total-price">Rp 0</p>
+                        <p class="text-brand-textMuted font-medium uppercase tracking-widest text-sm">Total Due</p>
+                        <p class="text-brand-accent font-black text-3xl" id="checkout-total-price">Rp 0</p>
                     </div>
                 </div>
             </div>
 
-            <!-- Payment Method -->
-            <div class="mb-8">
-                <h3 class="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4">Transfer Bank</h3>
-                <div class="bg-white border-2 border-gray-100 rounded-2xl p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 hover:border-brand-300 transition-colors">
-                    <div class="flex items-center gap-4">
-                        <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600 font-black text-xl italic shrink-0">
+            <div class="mb-10">
+                <h3 class="text-xs font-bold text-brand-textMuted uppercase tracking-widest mb-6">Payment Transfer</h3>
+                <div class="border border-white/10 rounded-sm p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 bg-brand-bg hover:border-brand-accent/50 transition-colors">
+                    <div class="flex items-center gap-6">
+                        <div class="w-16 h-16 bg-white rounded-sm flex items-center justify-center text-[#0066AE] font-black text-2xl italic shrink-0">
                             BCA
                         </div>
                         <div>
-                            <p class="text-gray-900 font-mono font-bold text-lg tracking-wider" id="rek-bca">1100937278</p>
-                            <p class="text-xs text-gray-500" id="rek-nama">a.n Doni Darmawan Zohar</p>
+                            <p class="text-white font-mono font-bold text-2xl tracking-widest mb-1" id="rek-bca">1100937278</p>
+                            <p class="text-sm text-brand-textMuted" id="rek-nama">a.n Doni Darmawan Zohar</p>
                         </div>
                     </div>
-                    <button onclick="salinTeks('rek-bca')" class="text-brand-600 bg-brand-50 hover:bg-brand-100 px-4 py-2 rounded-xl text-xs font-bold transition-colors flex items-center gap-2">
-                        <i class="fa-regular fa-copy"></i> Salin
+                    <button onclick="salinTeks('rek-bca')" class="border border-brand-textMuted text-white hover:border-white hover:bg-white hover:text-brand-bg px-6 py-3 rounded-sm text-xs font-bold uppercase tracking-widest transition-all flex items-center gap-2">
+                        <i class="fa-regular fa-copy"></i> Copy
                     </button>
                 </div>
             </div>
 
-            <!-- Confirm Action -->
-            <button onclick="konfirmasiWhatsApp()" class="w-full bg-[#25D366] text-white font-bold py-4 rounded-2xl text-sm hover:bg-[#20bd5a] transition-colors shadow-lg shadow-[#25D366]/30 flex items-center justify-center gap-3 app-card">
-                <i class="fa-brands fa-whatsapp text-xl"></i> Konfirmasi Pembayaran
+            <button onclick="konfirmasiWhatsApp()" class="w-full btn-solid py-4 rounded-sm font-bold uppercase tracking-widest text-sm flex items-center justify-center gap-3">
+                <i class="fa-brands fa-whatsapp text-xl"></i> Confirm via WhatsApp
             </button>
-            <p class="text-center text-xs text-gray-400 mt-4">Kirimkan bukti transfer untuk mendapatkan akses.</p>
+            <p class="text-center text-xs text-brand-textMuted mt-6">Kirimkan bukti transfer melalui WhatsApp untuk verifikasi otomatis.</p>
         </div>
     </div>
 
-
     <!-- ========================================== -->
-    <!-- MODAL KONFIRMASI PRODUK SATUAN (Bottom Sheet) -->
+    <!-- MODAL KONFIRMASI PRODUK SATUAN -->
     <!-- ========================================== -->
-    <div id="custom-modal" class="fixed inset-0 z-[100] hidden items-end sm:items-center justify-center bg-gray-900/40 backdrop-blur-sm p-0 sm:p-4 opacity-0 transition-opacity duration-300">
-        <div class="bg-white w-full sm:max-w-sm rounded-t-[2rem] sm:rounded-[2rem] p-6 shadow-2xl transform translate-y-full sm:translate-y-0 sm:scale-95 transition-all duration-300 relative" id="modal-content">
+    <div id="custom-modal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-brand-bg/90 backdrop-blur-sm p-4 opacity-0 transition-opacity duration-300">
+        <div class="bg-brand-surface w-full max-w-md rounded-sm p-8 transform scale-95 transition-all duration-300 border border-white/10 shadow-2xl" id="modal-content">
             
-            <div class="w-16 h-16 bg-brand-50 rounded-2xl flex items-center justify-center mx-auto mb-4 text-brand-600 text-2xl">
-                <i class="fa-solid fa-cart-shopping"></i>
-            </div>
+            <h3 class="text-2xl font-bold text-white mb-2">Confirm Action</h3>
+            <p class="text-brand-textMuted mb-8 text-sm leading-relaxed" id="modal-text">Loading...</p>
             
-            <h3 class="text-xl font-extrabold text-center text-gray-900 mb-2">Tambah ke Troli</h3>
-            <p class="text-center text-gray-500 mb-6 text-sm" id="modal-text">Loading...</p>
-            
-            <div class="flex flex-col gap-3 pb-safe">
-                <button onclick="lanjutKeCheckout()" class="w-full py-3.5 bg-gray-900 text-white rounded-xl font-bold hover:bg-black transition-colors text-sm shadow-md">
-                    Lanjut Pembayaran
+            <div class="flex flex-col sm:flex-row gap-4">
+                <button onclick="tutupModal()" class="w-full sm:w-1/2 py-3 border border-white/20 text-white rounded-sm font-bold hover:border-white transition-colors text-xs uppercase tracking-widest">
+                    Cancel
                 </button>
-                <button onclick="tutupModal()" class="w-full py-3.5 bg-gray-100 text-gray-700 rounded-xl font-bold hover:bg-gray-200 transition-colors text-sm">
-                    Batal
+                <button onclick="lanjutKeCheckout()" class="w-full sm:w-1/2 py-3 btn-solid rounded-sm font-bold text-xs uppercase tracking-widest">
+                    Proceed
                 </button>
             </div>
         </div>
     </div>
 
     <!-- ========================================== -->
-    <!-- MODAL PILIH 4 PRODUK BUNDLING (Bottom Sheet) -->
+    <!-- MODAL PILIH 4 PRODUK BUNDLING -->
     <!-- ========================================== -->
-    <div id="bundle-modal" class="fixed inset-0 z-[110] hidden items-end sm:items-center justify-center bg-gray-900/60 backdrop-blur-sm p-0 sm:p-4 opacity-0 transition-opacity duration-300">
-        <div class="bg-white w-full sm:max-w-lg rounded-t-[2rem] sm:rounded-[2rem] p-6 shadow-2xl transform translate-y-full sm:translate-y-0 sm:scale-95 transition-all duration-300 relative flex flex-col max-h-[90vh] sm:max-h-[85vh]" id="bundle-content">
+    <div id="bundle-modal" class="fixed inset-0 z-[110] hidden items-center justify-center bg-brand-bg/95 p-4 opacity-0 transition-opacity duration-300">
+        <div class="absolute inset-0" onclick="tutupBundleModal()"></div>
+        
+        <div class="bg-brand-surface w-full max-w-3xl rounded-sm p-8 shadow-2xl transform scale-95 transition-all duration-300 relative flex flex-col max-h-[90vh] border border-white/10" id="bundle-content">
             
-            <!-- Header Modal -->
-            <div class="flex justify-between items-center mb-4 border-b border-gray-100 pb-4 shrink-0">
+            <div class="flex justify-between items-start mb-6 border-b border-white/10 pb-6 shrink-0 relative z-10">
                 <div>
-                    <h3 class="text-xl font-extrabold text-gray-900">Pilih 4 Produk</h3>
-                    <p id="bundle-counter" class="text-sm font-bold text-brand-600 mt-1">0/4 Terpilih</p>
+                    <h3 class="text-3xl font-bold text-white mb-2">Build Your Bundle</h3>
+                    <p class="text-sm font-medium text-brand-textMuted">Pilih 4 sistem untuk mendapatkan harga spesial Bundle.</p>
                 </div>
-                <button onclick="tutupBundleModal()" class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-200">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-            </div>
-
-            <!-- List Pilihan Produk -->
-            <div class="overflow-y-auto flex-grow hide-scrollbar pb-2">
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 p-1">
-                    
-                    <!-- Item Selectable -->
-                    <div class="border-2 border-gray-100 rounded-xl p-3 flex items-center gap-3 cursor-pointer hover:border-brand-300 transition-colors bundle-item" onclick="toggleBundleItem(this, 'ZHR Engine')">
-                        <div class="w-10 h-10 rounded-lg overflow-hidden shrink-0"><img src="https://unsplash.com/photos/Qi1jCIhnmFY/download?w=150" alt="Podcast" class="w-full h-full object-cover"></div>
-                        <span class="font-semibold text-gray-800 text-sm flex-grow">ZHR Engine</span>
-                        <div class="check-icon hidden text-brand-600"><i class="fa-solid fa-circle-check text-xl"></i></div>
-                    </div>
-                    <div class="border-2 border-gray-100 rounded-xl p-3 flex items-center gap-3 cursor-pointer hover:border-brand-300 transition-colors bundle-item" onclick="toggleBundleItem(this, 'Doc & Drama Engine')">
-                        <div class="w-10 h-10 rounded-lg overflow-hidden shrink-0"><img src="https://unsplash.com/photos/8umEwssg2eU/download?w=150" alt="Film" class="w-full h-full object-cover"></div>
-                        <span class="font-semibold text-gray-800 text-sm flex-grow">Doc & Drama</span>
-                        <div class="check-icon hidden text-brand-600"><i class="fa-solid fa-circle-check text-xl"></i></div>
-                    </div>
-                    <div class="border-2 border-gray-100 rounded-xl p-3 flex items-center gap-3 cursor-pointer hover:border-brand-300 transition-colors bundle-item" onclick="toggleBundleItem(this, 'Audio Engine')">
-                        <div class="w-10 h-10 rounded-lg overflow-hidden shrink-0"><img src="https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&w=150&q=80" alt="Mixing" class="w-full h-full object-cover"></div>
-                        <span class="font-semibold text-gray-800 text-sm flex-grow">Audio Engine</span>
-                        <div class="check-icon hidden text-brand-600"><i class="fa-solid fa-circle-check text-xl"></i></div>
-                    </div>
-                    <div class="border-2 border-gray-100 rounded-xl p-3 flex items-center gap-3 cursor-pointer hover:border-brand-300 transition-colors bundle-item" onclick="toggleBundleItem(this, 'Dapur Pintar')">
-                        <div class="w-10 h-10 rounded-lg overflow-hidden shrink-0"><img src="https://images.unsplash.com/photo-1577219491135-ce391730fb2c?auto=format&fit=crop&w=150&q=80" alt="Koki" class="w-full h-full object-cover"></div>
-                        <span class="font-semibold text-gray-800 text-sm flex-grow">Dapur Pintar</span>
-                        <div class="check-icon hidden text-brand-600"><i class="fa-solid fa-circle-check text-xl"></i></div>
-                    </div>
-                    <div class="border-2 border-gray-100 rounded-xl p-3 flex items-center gap-3 cursor-pointer hover:border-brand-300 transition-colors bundle-item" onclick="toggleBundleItem(this, 'Architec Render')">
-                        <div class="w-10 h-10 rounded-lg overflow-hidden shrink-0"><img src="https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=150&q=80" alt="Arsitek" class="w-full h-full object-cover"></div>
-                        <span class="font-semibold text-gray-800 text-sm flex-grow">Architec Render</span>
-                        <div class="check-icon hidden text-brand-600"><i class="fa-solid fa-circle-check text-xl"></i></div>
-                    </div>
-                    <div class="border-2 border-gray-100 rounded-xl p-3 flex items-center gap-3 cursor-pointer hover:border-brand-300 transition-colors bundle-item" onclick="toggleBundleItem(this, 'Fashion Engine')">
-                        <div class="w-10 h-10 rounded-lg overflow-hidden shrink-0"><img src="https://unsplash.com/photos/KqgEIgqarFc/download?w=150" alt="Fashion" class="w-full h-full object-cover"></div>
-                        <span class="font-semibold text-gray-800 text-sm flex-grow">Fashion Engine</span>
-                        <div class="check-icon hidden text-brand-600"><i class="fa-solid fa-circle-check text-xl"></i></div>
-                    </div>
-                    <div class="border-2 border-gray-100 rounded-xl p-3 flex items-center gap-3 cursor-pointer hover:border-brand-300 transition-colors bundle-item" onclick="toggleBundleItem(this, 'Photo Product')">
-                        <div class="w-10 h-10 rounded-lg overflow-hidden shrink-0"><img src="https://unsplash.com/photos/PdbUq75g5gk/download?w=150" alt="Studio" class="w-full h-full object-cover"></div>
-                        <span class="font-semibold text-gray-800 text-sm flex-grow">Photo Product</span>
-                        <div class="check-icon hidden text-brand-600"><i class="fa-solid fa-circle-check text-xl"></i></div>
-                    </div>
-                    <div class="border-2 border-gray-100 rounded-xl p-3 flex items-center gap-3 cursor-pointer hover:border-brand-300 transition-colors bundle-item" onclick="toggleBundleItem(this, 'AI Influencer')">
-                        <div class="w-10 h-10 rounded-lg overflow-hidden shrink-0"><img src="https://unsplash.com/photos/enQcrUMOp_U/download?w=150" alt="Influencer" class="w-full h-full object-cover"></div>
-                        <span class="font-semibold text-gray-800 text-sm flex-grow">AI Influencer</span>
-                        <div class="check-icon hidden text-brand-600"><i class="fa-solid fa-circle-check text-xl"></i></div>
-                    </div>
-                    
+                <div class="flex flex-col items-end">
+                    <button onclick="tutupBundleModal()" class="text-brand-textMuted hover:text-white transition-all mb-2">
+                        <i class="fa-solid fa-xmark text-2xl"></i>
+                    </button>
+                    <p id="bundle-counter" class="text-brand-accent font-bold tracking-widest text-sm uppercase mt-2">0/4 Selected</p>
                 </div>
             </div>
 
-            <!-- Footer Action -->
-            <div class="pt-4 border-t border-gray-100 mt-2 shrink-0 pb-safe">
-                <button id="btn-lanjut-bundle" onclick="lanjutKeCheckoutBundle()" disabled class="w-full py-4 bg-gray-300 text-gray-500 rounded-xl font-bold transition-all text-sm uppercase tracking-wide">
-                    Pilih 4 Produk Terlebih Dahulu
+            <!-- List Pilihan Bundle -->
+            <div class="overflow-y-auto flex-grow hide-scrollbar pb-4 relative z-10">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="bundle-list-container">
+                    <!-- Injected by JS -->
+                </div>
+            </div>
+
+            <div class="pt-6 border-t border-white/10 mt-2 shrink-0 pb-safe relative z-10">
+                <button id="btn-lanjut-bundle" onclick="lanjutKeCheckoutBundle()" disabled class="w-full py-4 border border-white/10 text-white/30 rounded-sm font-bold transition-all text-xs uppercase tracking-widest bg-transparent">
+                    Select 4 Items to Proceed
                 </button>
             </div>
         </div>
     </div>
 
 
-    <!-- Mobile Bottom Navigation Bar -->
-    <div class="md:hidden fixed bottom-0 w-full bg-white border-t border-gray-100 pb-safe z-40 shadow-[0_-10px_20px_rgba(0,0,0,0.03)]">
-        <div class="flex justify-around items-center h-16">
-            <a href="#" onclick="kembaliKeHome()" class="flex flex-col items-center justify-center w-full h-full text-brand-600">
-                <i class="fa-solid fa-house text-lg mb-1"></i>
-                <span class="text-[9px] font-bold">Home</span>
-            </a>
-            <a href="#browse" onclick="kembaliKeHome()" class="flex flex-col items-center justify-center w-full h-full text-gray-400 hover:text-gray-900 transition-colors">
-                <i class="fa-solid fa-compass text-lg mb-1"></i>
-                <span class="text-[9px] font-medium">Browse</span>
-            </a>
-            <a href="#" class="flex flex-col items-center justify-center w-full h-full text-gray-400 hover:text-gray-900 transition-colors">
-                <i class="fa-solid fa-bookmark text-lg mb-1"></i>
-                <span class="text-[9px] font-medium">Saved</span>
-            </a>
-            <a href="#" class="flex flex-col items-center justify-center w-full h-full text-gray-400 hover:text-gray-900 transition-colors">
-                <i class="fa-regular fa-user text-lg mb-1"></i>
-                <span class="text-[9px] font-medium">Profile</span>
-            </a>
-        </div>
-    </div>
+    <!-- Mobile Bottom Navigation Bar (Hidden in this layout style to keep it clean like the video, relying on Top Nav) -->
 
 
     <!-- ========================================== -->
     <!-- JAVASCRIPT LOGIC -->
     <!-- ========================================== -->
     <script>
+        // Database Produk Terpusat - Reordered
+        const productsData = [
+            {
+                id: 'zhr-engine',
+                name: 'ZHR Engine',
+                shortDesc: 'Podcast & Storyboard',
+                longDesc: 'Sistem komprehensif untuk mengotomatisasi alur kerja produksi konten Anda. Ideal untuk kreator podcast, perancang storyboard, dan peluncuran produk digital.',
+                features: ['AI Prompt Generator', 'Template Notion Terintegrasi', 'Sistem Manajemen Aset Cerdas'],
+                price: 99000,
+                originalPrice: 145000,
+                image: 'https://images.unsplash.com/photo-1589903308904-1010c2294adc?auto=format&fit=crop&w=1000&q=80',
+                tag: '01'
+            },
+            {
+                id: 'photo-product',
+                name: 'Photo Product',
+                shortDesc: 'Studio Virtual High-End',
+                longDesc: 'Hasilkan foto produk komersial dengan lighting profesional secara virtual. Tidak perlu menyewa studio mahal, cukup dengan aset mentah produk Anda.',
+                features: ['Lighting Setup Virtual', 'Smart Background Generator', 'Mockup Templates E-commerce'],
+                price: 99000,
+                originalPrice: 145000,
+                image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=1000&q=80',
+                tag: '02'
+            },
+            {
+                id: 'ai-influencer',
+                name: 'AI Influencer',
+                shortDesc: 'Karakter Virtual AI',
+                longDesc: 'Panduan dan blueprint lengkap untuk menciptakan, menganimasikan, dan mengelola persona AI Influencer yang konsisten di berbagai platform media sosial.',
+                features: ['Teknik Konsistensi Wajah AI', 'Social Media Content Planner', 'Voice Cloning Guideline'],
+                price: 99000,
+                originalPrice: 145000,
+                image: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?auto=format&fit=crop&w=1000&q=80',
+                tag: '03'
+            },
+            {
+                id: 'doc-drama',
+                name: 'Doc & Drama',
+                shortDesc: 'Produksi Film & Drama',
+                longDesc: 'Framework mutakhir untuk pra-produksi hingga pasca-produksi film dokumenter dan drama. Menghemat waktu manajemen kru dan syuting hingga 70%.',
+                features: ['Timeline Tracker Otomatis', 'Database Kru & Talent Management', 'Breakdown Script AI'],
+                price: 99000,
+                originalPrice: 145000,
+                image: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=1000&q=80',
+                tag: '04'
+            },
+            {
+                id: 'fashion-engine',
+                name: 'Fashion Engine',
+                shortDesc: 'Desain Busana Real',
+                longDesc: 'Sistem desain fashion berbasis AI. Ubah coretan ide baju Anda menjadi foto katalog dengan model profesional dalam hitungan detik tanpa perlu studio fisik.',
+                features: ['Virtual Try-On Generator', 'Katalog Model Diverse AI', 'Ekstraksi Pola (Pattern)'],
+                price: 99000,
+                originalPrice: 145000,
+                image: 'https://images.unsplash.com/photo-1558769132-cb1aea458c5e?auto=format&fit=crop&w=1000&q=80',
+                tag: '05'
+            },
+            {
+                id: 'architec-render',
+                name: 'Architec Render',
+                shortDesc: 'Render 2D ke 3D',
+                longDesc: 'Kumpulan workflow visualisasi AI untuk mengubah sketsa kasar dan denah 2D menjadi visualisasi 3D arsitektur dan interior yang super fotorealistis.',
+                features: ['Workflow ComfyUI Khusus', 'Library Material Fotorealistik', 'Prompt Arsitektur Presisi'],
+                price: 99000,
+                originalPrice: 145000,
+                image: 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=1000&q=80',
+                tag: '06'
+            },
+            {
+                id: 'dapur-pintar',
+                name: 'Dapur Pintar',
+                shortDesc: 'Sistem Resep Masakan',
+                longDesc: 'Bangun database resep pribadi Anda dengan sistem cerdas. Otomatis merencanakan meal-prep mingguan dan mengekstrak daftar belanja berdasarkan diet Anda.',
+                features: ['Smart Meal Planner', 'Auto Grocery List Generator', 'Kalkulator Nutrisi Integrasi'],
+                price: 99000,
+                originalPrice: 145000,
+                image: 'https://images.unsplash.com/photo-1577219491135-ce391730fb2c?auto=format&fit=crop&w=1000&q=80',
+                tag: '07'
+            },
+            {
+                id: 'audio-engine',
+                name: 'Audio Engine',
+                shortDesc: 'Musik & Sound Effect',
+                longDesc: 'Alat bantu digital untuk komposer dan sound engineer. Dilengkapi perpustakaan prompt untuk sintesis suara kreatif dan manajemen project audio skala besar.',
+                features: ['Manajemen Track Berbasis AI', 'Library Prompt Synthesizer', 'SFX Database Organizer'],
+                price: 99000,
+                originalPrice: 145000,
+                image: 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&w=1000&q=80',
+                tag: '08'
+            }
+        ];
+
         // State Management
+        let activeProductId = productsData[0].id;
         let currentProduct = '';
         let currentPrice = 0;
         let orderId = '';
-        
-        // Bundle State
         let selectedBundleProducts = [];
         const maxBundleItems = 4;
-        
-        // Data Statis Admin
         const noWhatsAppAdmin = "6285191471070";
 
         // DOM Elements
-        const mainPage = document.getElementById('main-page');
-        const checkoutPage = document.getElementById('checkout-page');
-        const modal = document.getElementById('custom-modal');
-        const modalContent = document.getElementById('modal-content');
-        const modalText = document.getElementById('modal-text');
+        const sliderContainer = document.getElementById('product-slider');
+        const bundleListContainer = document.getElementById('bundle-list-container');
+        const heroContent = document.getElementById('hero-content');
+        const heroImg = document.getElementById('hero-img');
 
         // ==========================================
-        // FUNGSI TOAST NOTIFICATION
+        // INISIALISASI & RENDER DATA PRODUK
         // ==========================================
+        function initApp() {
+            renderSlider();
+            renderBundleList();
+            updateHeroPanel(activeProductId);
+        }
+
+        // Render Horizontal Slider Thumbnails (Match Video "Choose your Adventure" style)
+        function renderSlider() {
+            sliderContainer.innerHTML = '';
+            productsData.forEach((prod, index) => {
+                const isActive = prod.id === activeProductId;
+                const activeClass = isActive ? 'card-active' : 'bg-brand-surface border border-white/5 hover:border-brand-textMuted opacity-80 hover:opacity-100';
+                
+                // Format Number (01, 02)
+                const num = (index + 1).toString().padStart(2, '0');
+
+                const card = document.createElement('div');
+                card.className = `min-w-[260px] md:min-w-[300px] p-6 rounded-sm cursor-pointer snap-center transition-all duration-300 flex flex-col ${activeClass}`;
+                card.onclick = () => selectProduct(prod.id);
+                
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-4">
+                        <span class="text-white font-mono font-bold text-lg">${num}</span>
+                    </div>
+                    <div class="w-full aspect-[4/3] rounded-sm overflow-hidden mb-6 bg-brand-bg relative">
+                        <img src="${prod.image}" class="w-full h-full object-cover opacity-90 hover:opacity-100 transition-opacity" alt="${prod.name}">
+                    </div>
+                    <div class="text-center flex-grow flex flex-col items-center">
+                        <h4 class="font-bold text-white text-xl mb-2">${prod.name}</h4>
+                        <p class="text-brand-textMuted text-xs mb-6 line-clamp-2 px-2">${prod.shortDesc}</p>
+                        <button class="mt-auto w-full py-2.5 text-xs font-bold uppercase tracking-widest ${isActive ? 'btn-solid rounded-sm' : 'btn-outline rounded-sm'}">
+                            Explore More
+                        </button>
+                    </div>
+                `;
+                sliderContainer.appendChild(card);
+            });
+        }
+
+        function selectProduct(id) {
+            if(activeProductId === id) return; 
+            activeProductId = id;
+            
+            // Animation Trigger
+            heroContent.classList.remove('fade-in-up');
+            heroImg.style.opacity = '0.3';
+            void heroContent.offsetWidth; // Trigger reflow
+            
+            setTimeout(() => {
+                updateHeroPanel(id);
+                heroContent.classList.add('fade-in-up');
+                heroImg.style.opacity = '1';
+            }, 150);
+
+            renderSlider();
+
+            const selectedElem = sliderContainer.children[productsData.findIndex(p => p.id === id)];
+            if(selectedElem) {
+                selectedElem.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+            }
+
+            // Secara otomatis selalu arahkan ke Detail Section (Product Spotlight)
+            document.getElementById('detail-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // Update Detail Box (Match Video "Browse our Gallery" style)
+        function updateHeroPanel(id) {
+            const prod = productsData.find(p => p.id === id);
+            if(!prod) return;
+
+            document.getElementById('hero-img').src = prod.image;
+            document.getElementById('hero-title').innerText = prod.name;
+            document.getElementById('hero-short-desc').innerText = prod.shortDesc;
+            document.getElementById('hero-long-desc').innerText = prod.longDesc;
+            
+            const featuresList = document.getElementById('hero-features');
+            featuresList.innerHTML = prod.features.map(f => 
+                `<div class="flex justify-between border-b border-white/5 py-2">
+                    <span class="text-brand-textMuted text-sm">${f}</span>
+                    <i class="fa-solid fa-check text-brand-accent text-xs mt-1"></i>
+                </div>`
+            ).join('');
+
+            // In video, top right of gallery is a year. We use formatted Price.
+            document.getElementById('hero-price-tag').innerText = `Rp ${(prod.price/1000)}k`;
+
+            currentProduct = prod.name;
+            currentPrice = prod.price;
+        }
+
+        function scrollSlider(direction) {
+            const scrollAmount = window.innerWidth > 768 ? 400 : 280;
+            if (direction === 'left') {
+                sliderContainer.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+            } else {
+                sliderContainer.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+            }
+        }
+
+        // ==========================================
+        // FUNGSI UMUM & MODAL
+        // ==========================================
+        const formatRupiah = (angka) => {
+            return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(angka);
+        };
+
         function showToast(message) {
             const toast = document.getElementById('toast');
-            const text = document.getElementById('toast-message');
-            
-            text.innerText = message;
+            document.getElementById('toast-message').innerText = message;
             toast.classList.remove('-translate-y-20', 'opacity-0');
             toast.classList.add('translate-y-0', 'opacity-100');
-            
             setTimeout(() => {
                 toast.classList.add('-translate-y-20', 'opacity-0');
                 toast.classList.remove('translate-y-0', 'opacity-100');
             }, 3000);
         }
 
-        // Format Rupiah
-        const formatRupiah = (angka) => {
-            return new Intl.NumberFormat('id-ID', {
-                style: 'currency',
-                currency: 'IDR',
-                minimumFractionDigits: 0
-            }).format(angka);
-        };
+        function bukaModalHero() {
+            bukaModal(currentProduct, currentPrice);
+        }
 
-        // ==========================================
-        // FUNGSI MODAL PRODUK SATUAN
-        // ==========================================
+        const modal = document.getElementById('custom-modal');
+        const modalContent = document.getElementById('modal-content');
+        
         function bukaModal(nama, harga) {
             currentProduct = nama;
             currentPrice = harga;
-            selectedBundleProducts = []; // Reset jika user sebelumnya main di modal bundle
+            selectedBundleProducts = []; 
             
-            modalText.innerHTML = `Membeli <strong class="text-gray-900">${nama}</strong> seharga ${formatRupiah(harga)}`;
+            document.getElementById('modal-text').innerHTML = `Menambahkan <strong class="text-white">${nama}</strong> ke daftar setup Anda seharga <span class="text-brand-accent">${formatRupiah(harga)}</span>.`;
             
             modal.classList.remove('hidden');
             modal.classList.add('flex');
             
             setTimeout(() => {
                 modal.classList.remove('opacity-0');
-                modalContent.classList.remove('translate-y-full', 'scale-95');
-                modalContent.classList.add('sheet-enter');
+                modalContent.classList.remove('scale-95');
             }, 10);
         }
 
         function tutupModal() {
             modal.classList.add('opacity-0');
-            modalContent.classList.remove('sheet-enter');
-            modalContent.classList.add('translate-y-full'); // For mobile exit
-            if(window.innerWidth >= 640) modalContent.classList.add('scale-95'); // For desktop exit
+            modalContent.classList.add('scale-95');
             setTimeout(() => {
                 modal.classList.add('hidden');
                 modal.classList.remove('flex');
@@ -673,20 +660,39 @@
         }
 
         // ==========================================
-        // FUNGSI MODAL BUNDLE (PILIH 4 PRODUK)
+        // MODAL BUNDLE & DAFTAR BUNDLE DINAMIS
         // ==========================================
+        function renderBundleList() {
+            bundleListContainer.innerHTML = '';
+            productsData.forEach(prod => {
+                const isSelected = selectedBundleProducts.includes(prod.name);
+                const activeClass = isSelected ? 'border-brand-accent bg-brand-surface2' : 'border-white/10 bg-brand-bg hover:border-white/30';
+                const checkClass = isSelected ? 'opacity-100' : 'opacity-0';
+
+                const div = document.createElement('div');
+                div.className = `border rounded-sm p-4 flex items-center gap-4 cursor-pointer transition-all ${activeClass}`;
+                div.onclick = () => toggleBundleItem(div, prod.name);
+                
+                div.innerHTML = `
+                    <div class="w-16 h-16 rounded-sm overflow-hidden shrink-0 bg-[#0f0518]"><img src="${prod.image}" class="w-full h-full object-cover opacity-80"></div>
+                    <div class="flex-grow">
+                        <span class="font-bold text-white text-base block mb-1">${prod.name}</span>
+                        <span class="text-xs text-brand-textMuted uppercase tracking-widest">${prod.shortDesc}</span>
+                    </div>
+                    <div class="w-6 h-6 border border-brand-textMuted rounded-full flex items-center justify-center shrink-0 ${isSelected ? 'border-brand-accent bg-brand-accent' : ''}">
+                        <i class="fa-solid fa-check text-white text-xs ${checkClass} transition-opacity"></i>
+                    </div>
+                `;
+                bundleListContainer.appendChild(div);
+            });
+        }
+
         const bundleModal = document.getElementById('bundle-modal');
         const bundleContent = document.getElementById('bundle-content');
         
         function bukaBundleModal() {
             selectedBundleProducts = [];
-            
-            // Reset UI Pilihan Produk
-            document.querySelectorAll('.bundle-item').forEach(el => {
-                el.classList.remove('border-brand-600', 'bg-brand-50');
-                el.classList.add('border-gray-100');
-                el.querySelector('.check-icon').classList.add('hidden');
-            });
+            renderBundleList();
             updateBundleCounter();
 
             bundleModal.classList.remove('hidden');
@@ -694,16 +700,13 @@
             
             setTimeout(() => {
                 bundleModal.classList.remove('opacity-0');
-                bundleContent.classList.remove('translate-y-full', 'scale-95');
-                bundleContent.classList.add('sheet-enter');
+                bundleContent.classList.remove('scale-95');
             }, 10);
         }
 
         function tutupBundleModal() {
             bundleModal.classList.add('opacity-0');
-            bundleContent.classList.remove('sheet-enter');
-            bundleContent.classList.add('translate-y-full');
-            if(window.innerWidth >= 640) bundleContent.classList.add('scale-95');
+            bundleContent.classList.add('scale-95');
             setTimeout(() => {
                 bundleModal.classList.add('hidden');
                 bundleModal.classList.remove('flex');
@@ -712,53 +715,41 @@
 
         function toggleBundleItem(element, productName) {
             const index = selectedBundleProducts.indexOf(productName);
-            
             if (index > -1) {
-                // Hapus jika sudah dipilih
                 selectedBundleProducts.splice(index, 1);
-                element.classList.remove('border-brand-600', 'bg-brand-50');
-                element.classList.add('border-gray-100');
-                element.querySelector('.check-icon').classList.add('hidden');
             } else {
-                // Tambah jika belum batas maksimal
                 if (selectedBundleProducts.length < maxBundleItems) {
                     selectedBundleProducts.push(productName);
-                    element.classList.add('border-brand-600', 'bg-brand-50');
-                    element.classList.remove('border-gray-100');
-                    element.querySelector('.check-icon').classList.remove('hidden');
                 } else {
-                    showToast("Anda sudah memilih 4 produk!");
+                    showToast("Maksimal 4 produk tercapai!");
+                    return;
                 }
             }
+            renderBundleList(); // Re-render to update styles
             updateBundleCounter();
         }
 
         function updateBundleCounter() {
             const count = selectedBundleProducts.length;
-            document.getElementById('bundle-counter').innerText = `${count}/${maxBundleItems} Terpilih`;
-            
+            document.getElementById('bundle-counter').innerText = `${count}/${maxBundleItems} Selected`;
             const btn = document.getElementById('btn-lanjut-bundle');
+            
             if (count === maxBundleItems) {
                 btn.disabled = false;
-                btn.innerText = "Lanjut Pembayaran";
-                btn.classList.remove('bg-gray-300', 'text-gray-500');
-                btn.classList.add('bg-brand-600', 'text-white', 'shadow-lg', 'shadow-brand-500/30', 'hover:bg-brand-700');
+                btn.innerText = "Proceed to Checkout";
+                btn.className = "w-full py-4 btn-solid rounded-sm font-bold transition-all text-sm uppercase tracking-widest";
             } else {
                 btn.disabled = true;
-                btn.innerText = "Pilih 4 Produk Terlebih Dahulu";
-                btn.classList.add('bg-gray-300', 'text-gray-500');
-                btn.classList.remove('bg-brand-600', 'text-white', 'shadow-lg', 'shadow-brand-500/30', 'hover:bg-brand-700');
+                btn.innerText = `Select ${maxBundleItems - count} more item(s)`;
+                btn.className = "w-full py-4 border border-white/10 text-white/30 rounded-sm font-bold transition-all text-xs uppercase tracking-widest bg-transparent cursor-not-allowed";
             }
         }
 
         function lanjutKeCheckoutBundle() {
             if (selectedBundleProducts.length !== 4) return;
-            
             tutupBundleModal();
-            
             currentProduct = 'ZHR Ultimate System (Bundle 4 Produk)';
-            currentPrice = 149000;
-            
+            currentPrice = 145000;
             persiapkanHalamanCheckout();
         }
 
@@ -774,82 +765,91 @@
             orderId = 'ZHR-' + Math.floor(10000 + Math.random() * 90000);
             
             document.getElementById('checkout-order-id').innerText = '#' + orderId;
-            document.getElementById('checkout-product-name').innerText = currentProduct.includes('Bundle') ? 'ZHR Ultimate System' : currentProduct;
+            document.getElementById('checkout-product-name').innerText = currentProduct;
             document.getElementById('checkout-product-price').innerText = formatRupiah(currentPrice);
             document.getElementById('checkout-total-price').innerText = formatRupiah(currentPrice);
 
-            // Tampilkan list produk jika itu Bundle
             const bundleItemsContainer = document.getElementById('checkout-bundle-items');
             const divider = document.getElementById('checkout-divider');
             
             if (selectedBundleProducts.length > 0) {
-                bundleItemsContainer.innerHTML = selectedBundleProducts.map(p => `<li>${p}</li>`).join('');
+                bundleItemsContainer.innerHTML = selectedBundleProducts.map(p => `<li class="uppercase tracking-wider text-xs font-bold">${p}</li>`).join('');
                 bundleItemsContainer.classList.remove('hidden');
-                divider.classList.add('hidden'); // Sembunyikan divider biasa karena bundle list punya border bottom
+                divider.classList.add('hidden'); 
             } else {
                 bundleItemsContainer.classList.add('hidden');
                 divider.classList.remove('hidden');
             }
 
-            mainPage.classList.add('hidden');
-            mainPage.classList.remove('block');
-            checkoutPage.classList.remove('hidden');
-            checkoutPage.classList.add('block');
+            document.getElementById('main-page').classList.add('hidden');
+            document.getElementById('main-page').classList.remove('block');
+            document.getElementById('checkout-page').classList.remove('hidden');
+            document.getElementById('checkout-page').classList.add('block');
 
-            window.scrollTo(0, 0);
+            window.scrollTo({top: 0, behavior: 'smooth'});
         }
 
         function kembaliKeHome() {
-            checkoutPage.classList.add('hidden');
-            checkoutPage.classList.remove('block');
-            mainPage.classList.remove('hidden');
-            mainPage.classList.add('block');
-            window.scrollTo(0, 0);
+            document.getElementById('checkout-page').classList.add('hidden');
+            document.getElementById('checkout-page').classList.remove('block');
+            document.getElementById('main-page').classList.remove('hidden');
+            document.getElementById('main-page').classList.add('block');
+            window.scrollTo({top: 0, behavior: 'smooth'});
         }
 
         function salinTeks(elementId) {
             const textToCopy = document.getElementById(elementId).innerText;
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(textToCopy).then(() => showToast("Nomor berhasil disalin!"))
+                  .catch(err => fallbackCopyTextToClipboard(textToCopy));
+            } else {
+                fallbackCopyTextToClipboard(textToCopy);
+            }
+        }
+
+        function fallbackCopyTextToClipboard(text) {
             const tempInput = document.createElement("input");
-            tempInput.value = textToCopy;
+            tempInput.value = text;
+            tempInput.style.position = "absolute";
+            tempInput.style.left = "-9999px";
             document.body.appendChild(tempInput);
             tempInput.select();
-            
-            try {
-                document.execCommand("copy");
-                showToast("Berhasil disalin: " + textToCopy);
-            } catch (err) {
-                console.error('Gagal menyalin', err);
-            }
-            
+            try { document.execCommand("copy"); showToast("Nomor berhasil disalin!"); } 
+            catch (err) { showToast("Gagal menyalin"); }
             document.body.removeChild(tempInput);
         }
 
         function konfirmasiWhatsApp() {
             let detailPesanan = "";
-            
-            // Format WhatsApp khusus jika order bundle
             if (selectedBundleProducts.length > 0) {
-                detailPesanan = "%0A%0A*Pilihan 4 Produk:*";
-                selectedBundleProducts.forEach((p, i) => {
-                    detailPesanan += `%0A${i+1}. ${p}`;
-                });
+                detailPesanan = "%0A%0A*Setup Package:*";
+                selectedBundleProducts.forEach((p, i) => detailPesanan += `%0A${i+1}. ${p}`);
             }
-            
-            const pesan = `Halo Admin ZHR Store, saya ingin mengkonfirmasi pembayaran.%0A%0A*Order ID:* %23${orderId}%0A*Produk:* ${currentProduct}%0A*Total Transfer:* ${formatRupiah(currentPrice)}${detailPesanan}%0A%0ABerikut saya lampirkan bukti transfernya:`;
-            const linkWA = `https://wa.me/${noWhatsAppAdmin}?text=${pesan}`;
-            
-            window.open(linkWA, '_blank');
+            const pesan = `Halo ZHR Store.%0A%0ASaya ingin konfirmasi pembayaran.%0A*Order:* %23${orderId}%0A*Item:* ${currentProduct}%0A*Total:* ${formatRupiah(currentPrice)}${detailPesanan}%0A%0AIni bukti transfernya:`;
+            window.open(`https://wa.me/${noWhatsAppAdmin}?text=${pesan}`, '_blank');
         }
 
-        // Shadow Nav on Scroll
+        function tanyaAdmin() {
+            const pesan = `Halo ZHR Store, saya mau tanya-tanya dulu tentang Ultimate Bundle 4 Paket seharga Rp 145.000.`;
+            window.open(`https://wa.me/${noWhatsAppAdmin}?text=${pesan}`, '_blank');
+        }
+
+        // Navbar Scroll Effect
         const navbar = document.getElementById('navbar');
         window.addEventListener('scroll', () => {
-            if (window.scrollY > 10) {
-                navbar.classList.add('shadow-sm');
+            if (window.scrollY > 50) {
+                navbar.classList.add('bg-brand-bg/90', 'backdrop-blur-md', 'border-b', 'border-white/10');
+                navbar.classList.remove('bg-transparent', 'py-6');
+                navbar.classList.add('py-4');
             } else {
-                navbar.classList.remove('shadow-sm');
+                navbar.classList.remove('bg-brand-bg/90', 'backdrop-blur-md', 'border-b', 'border-white/10', 'py-4');
+                navbar.classList.add('bg-transparent', 'py-6');
             }
-        });
+        }, { passive: true });
+
+        // Mulai aplikasi
+        window.onload = initApp;
+        
     </script>
 </body>
 </html>
